@@ -1,13 +1,12 @@
 {
   "name": "@what/lang",
   "version": "0.1.0",
-  "exports": "./target/mod.ts",
+  "exports": "./src/main.ts",
   "tasks": {
-    "build": "mkdir -p target/ && wat2wasm -o target/mod.wasm src/mod.wat",
+    "build": "wat2wasm -o src/mod.wasm src/mod.wat",
     "run": "deno task build && deno run src/main.ts"
   },
   "imports": {
-    "@what/": "./target/",
     "@std/assert": "jsr:@std/assert@1"
   }
 }
