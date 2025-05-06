@@ -1,6 +1,26 @@
 (module
     (memory (export "memory") 1)
-    (global $len (mut i32) (i32.const 65536))
+
+    (global $alloc (mut i32) (i32.const 256))
+    (func $alloc (param $size i32) (result i32)
+        (loop $loop (if
+            (i32.gt_u
+                (i32.add (global.get $alloc) (local.get $size))
+                (i32.mul (memory.size) (i32.const 65536))
+            )
+        (then
+            (memory.grow (i32.const 1))
+            (br $loop)
+        )))
+
+        (global.get $alloc)
+        (global.set $alloc (i32.add (global.get $alloc) (local.get $size)))
+    )
+
+    (func $set_alloc (param $addr i32) (result)
+        (global.set $alloc (local.get $addr))
+    )
+
     (data (i32.const 0) "\00\00\00\00\00\00\00\00\00\00\01\00\00\00\00\00")
     (data (i32.const 16) "\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
     (data (i32.const 32) "\01\00\00\00\00\00\00\00\00\00\04\02\00\03\00\05")
@@ -18,87 +38,71 @@
     (data (i32.const 224) "\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
     (data (i32.const 240) "\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
 
-    (func $next_token (param $i i32) (result i32 i32 i32) ;; x, s, e
-        (local $x i32)
-        (local $s i32)
+    (func $scan (param $size i32) (result i32 i32) ;; (has_error, addr)
+        (local $i i32)
+        (local $o i32)
+        (local $char i32)
 
-        (loop $loop (if (i32.lt_u (local.get $i) (global.get $len)) (then
-            (local.set $x (i32.load8_u (i32.load8_u (local.get $i))))
+        (local.tee $i (i32.const 256))
+        (local.tee $size (i32.add (;;) (local.get $size)))
+        (local.set $o (;;))
 
-            (if (i32.eq (local.get $x) (i32.const 1)) (then
-                (local.set $i (i32.add (local.get $i) (i32.const 1)))
-                br $loop
+        (loop $next (if (i32.lt_u (local.get $i) (local.get $size)) (then
+            (local.tee $char (i32.load8_u (i32.load8_u (local.get $i))))
+            (if (i32.eqz (;;)) (then
+                (return (i32.const 1) (local.get $i))
             ))
-            (if (i32.ge_u (local.get $x) (i32.const 2)) (then
-                (if (i32.le_u (local.get $x) (i32.const 5)) (then
-                    (local.set $i (i32.add (local.get $i) (i32.const 1)))
-                    (return (local.get $x) (local.get $i) (local.get $i))
+            (if (i32.eq (local.get $char) (i32.const 1)) (then
+                (local.set $i (i32.add (local.get $i) (i32.const 1)))
+                (br $next)
+            ))
+            (if (i32.ge_u (local.get $char) (i32.const 2)) (then
+                (if (i32.le_u (local.get $char) (i32.const 5)) (then
+                    (i32.store8 (local.get $o) (local.get $char))
+                    (local.tee $o (i32.add (local.get $o) (i32.const 1)))
+                    (local.get $i)
+                    (i32.store (;;) (;;))
+                    (local.tee $o (i32.add (local.get $o) (i32.const 4)))
+                    (local.tee $i (i32.add (local.get $i) (i32.const 1)))
+                    (i32.store (;;) (;;))
+                    (local.set $o (i32.add (local.get $o) (i32.const 4)))
+                    (br $next)
                 ))
             ))
-            (if (i32.eq (local.get $x) (i32.const 6)) (then
-                (local.set $s (local.get $i))
+            (if (i32.eq (local.get $char) (i32.const 6)) (then
+                (i32.store8 (local.get $o) (local.get $char))
+                (local.tee $o (i32.add (local.get $o) (i32.const 1)))
+                (local.get $i)
+                (i32.store (;;) (;;))
                 (loop $num
-                    (local.set $i (i32.add (local.get $i) (i32.const 1)))
-                    (if (i32.lt_u (local.get $i) (global.get $len)) (then
-                        (br_if $num
-                            (i32.eq
-                                (i32.load8_u (i32.load8_u (local.get $i)))
-                                (i32.const 6)
-                            )
-                        )
-                    ))
+                    (local.tee $i (i32.add (local.get $i) (i32.const 1)))
+                    (br_if $num
+                        (i32.eq (i32.load8_u (i32.load8_u (;;))) (i32.const 6))
+                    )
                 )
-                (return (i32.const 6) (local.get $s) (local.get $i))
+                (local.tee $o (i32.add (local.get $o) (i32.const 4)))
+                (local.get $i)
+                (i32.store (;;) (;;))
+                (local.set $o (i32.add (local.get $o) (i32.const 4)))
+                (br $next)
             ))
-            (return
-                (i32.const -1)
-                (local.get $i)
-                (local.get $i)
-            )
+            unreachable
         )))
-
-        i32.const 0
-        i32.const 0
-        i32.const 0
+        (i32.const 0)
+        (local.get $o)
     )
 
-    (func (export "scan") (param $i i32) (result i32 i32)
-        (local $o i32)
-        (local $x i32)
-        (local $s i32)
+    (func (export "compile") (param $size i32) (result i32 i32 i32) ;; (has_error, addr)
+        (local $has_error i32)
+        (local $addr i32)
 
-        (local.set $o (i32.const 256))
-
-        (loop $loop (if (i32.lt_u (local.get $i) (global.get $len)) (then
-            (local.set $x
-                (local.set $s (local.set $i (call $next_token (local.get $i))))
-            )
-            (if (i32.eqz (local.get $x)) (then
-                (return (local.get $o) (i32.const 0))
-            ))
-            (if (i32.eq (local.get $x) (i32.const -1)) (then
-                (return (i32.load8_u (local.get $s)) (i32.const 1))
-            ))
-            (i32.store8 (local.get $o) (local.get $x))
-            (local.set $o (i32.add (local.get $o) (i32.const 1)))
-            (if (i32.sub (local.get $i) (local.get $s)) (then
-                (i32.store8
-                    (local.get $o)
-                    (i32.sub (local.get $i) (local.get $s))
-                )
-                (local.set $o (i32.add (local.get $o) (i32.const 1)))
-
-                (loop $copy
-                    (i32.store8 (local.get $o) (i32.load8_u (local.get $s)))
-                    (local.set $o (i32.add (local.get $o) (i32.const 1)))
-                    (local.set $s (i32.add (local.get $s) (i32.const 1)))
-                    (br_if $copy (i32.lt_u (local.get $s) (local.get $i)))
-                )
-            ))
-            br $loop
-        )))
-
-        local.get $o
+        (local.tee $has_error (local.set $addr (call $scan (local.get $size))))
+        (if (i32.ne (i32.const 0) (;;)) (then
+            (return (local.get $has_error) (local.get $addr) (local.get $addr))
+        ))
+        (call $set_alloc (local.get $addr))
         i32.const 0
+        (i32.add (local.get $size) (i32.const 256))
+        local.get $addr
     )
 )

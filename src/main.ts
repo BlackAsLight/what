@@ -1,31 +1,51 @@
-import { memory, scan } from "./mod.wasm";
+import { compile as c, memory } from "./mod.wasm";
 
 const buffer = new Uint8Array(memory.buffer);
 
-function scan_tokens(input: string): Uint8Array {
-  const output = new TextEncoder().encode(input) as Uint8Array<ArrayBuffer>;
-  buffer.set(output, buffer.length - output.length);
-  const [a, b] = scan(buffer.length - output.length);
-  if (b) throw new TypeError(`Unexpected Character: 0x${a.toString(16)}`);
-  return buffer.subarray(256, a);
+export function compile(input: string): Uint8Array {
+  const written = new TextEncoder()
+    .encodeInto(input, buffer.subarray(256)).written;
+  const [exit_code, addr1, addr2] = c(written) as unknown as [
+    number,
+    number,
+    number,
+  ];
+  if (exit_code) {
+    switch (exit_code) {
+      case 1:
+        throw new SyntaxError(`Unexpected character @ ${addr1 - 256}`);
+      default:
+        throw new Error(`Unknown Error Code: ${exit_code}`);
+    }
+  }
+  return buffer.slice(addr1, addr2);
 }
 
-console.log(scan_tokens("10 + -15"));
-/*
-  " ": [1]
-  "\n": [1]
-  "+": [2]
-  "-": [3]
-  "*": [4]
-  "/": [5]
-  "0": [6, len, bytes]
-  "1": [6, len, bytes]
-  "2": [6, len, bytes]
-  "3": [6, len, bytes]
-  "4": [6, len, bytes]
-  "5": [6, len, bytes]
-  "6": [6, len, bytes]
-  "7": [6, len, bytes]
-  "8": [6, len, bytes]
-  "9": [6, len, bytes]
+console.log(compile("10 + 15"));
+
+/* Token Enum // 1 Does not appear in array; merely to remove whitespace
+  " ": 1
+  "\n": 1
+  "+": 2
+  "-": 3
+  "*": 4
+  "/": 5
+  "0": 6
+  "1": 6
+  "2": 6
+  "3": 6
+  "4": 6
+  "5": 6
+  "6": 6
+  "7": 6
+  "8": 6
+  "9": 6
+*/
+
+/* Token Struct
+  {
+    token: i8
+    start_addr: i32
+    end_addr: i32
+  }
 */
