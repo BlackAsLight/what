@@ -92,7 +92,7 @@
         (local.get $o)
     )
 
-    (func (export "compile") (param $size i32) (result i32 i32 i32) ;; (has_error, addr)
+    (func (export "compile") (param $size i32) (result i32 i32 i32) ;; (has_error, start_addr, end_addr)
         (local $has_error i32)
         (local $addr i32)
 
