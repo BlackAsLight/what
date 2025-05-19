@@ -49,3 +49,28 @@ console.log(compile("10 + 15"));
     end_addr: i32
   }
 */
+
+/* AST Enum
+  Primary: {
+    id: i8
+    token_addr: i32
+  }
+  Unary: {
+    id: i8
+    token_addr: i32
+    expr_addr: i32
+  }
+  Binary: {
+    id: i8
+    expr_addr1: i32
+    token_addr: i32
+    expr_addr2: i32
+  }
+*/
+
+/* Compiler Response
+  0: Success
+  1: Syntax Error
+  2: Unexpected EOF
+  3: Unexpected Token
+*/
