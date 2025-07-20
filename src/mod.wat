@@ -407,8 +407,6 @@
     ))
     (call $set_alloc (local.get $addr))
 
-    ;; (;;) (i32.const 0)
-    ;; (;;) (local.get $addr)
     (;;) (;;) (call $ast
       (i32.add (local.get $size) (i32.const 256))
       (local.get $addr)
