@@ -2,66 +2,73 @@ import { compile as c, memory } from "./mod.wasm";
 
 const buffer = new Uint8Array(memory.buffer);
 
-/**
- * @example
- * ```ts
- * import { assertEquals } from "@std/assert";
- * import { encodeBase64 } from "@std/encoding/unstable-base64";
- * import { compile } from "@what/lang";
- *
- * const x =
- *   (await import(
- *     "data:application/wasm;base64," +
- *       encodeBase64(await compile("-10 * 15 + 2 - -8 / 2"))
- *   ))
- *     .main() as number;
- *
- * assertEquals(x, -144);
- * ```
- */
-export async function compile(input: string): Promise<Uint8Array<ArrayBuffer>> {
-  const written = new TextEncoder()
-    .encodeInto(input, buffer.subarray(256)).written;
-  const [exit_code, addr1, addr2] = c(written) as unknown as [
+export class WhatError extends Error {
+  constructor(message?: string, options?: ErrorOptions) {
+    super(message, options);
+  }
+}
+
+async function set(
+  input: string | Uint8Array | ReadableStream<Uint8Array>,
+): Promise<number> {
+  if (typeof input === "string") {
+    return new TextEncoder().encodeInto(input, buffer.subarray(256)).written;
+  }
+  if (input instanceof Uint8Array) {
+    buffer.set(input, 256);
+    return input.length;
+  }
+  let x = 256;
+  for await (const chunk of input) {
+    buffer.set(chunk, x);
+    x += chunk.length;
+  }
+  return x - 256;
+}
+
+export async function compile(
+  input: string | Uint8Array | ReadableStream<Uint8Array>,
+): Promise<ReadableStream<Uint8Array>> {
+  const [exit_code, addr1, addr2] = c(await set(input)) as unknown as [
     number,
     number,
     number,
   ];
+
   if (exit_code) {
     switch (exit_code) {
       case 1:
-        throw new SyntaxError(
+        throw new WhatError(
           `Unexpected character "${String.fromCharCode(buffer[addr1])}" @ ${
             addr1 - 255
           }`,
         );
       case 2:
-        throw new RangeError("Unexpected EOF");
+        throw new WhatError("Unexpected EOF");
       case 3: {
         const x = new DataView(buffer.buffer).getUint32(addr1 + 1, true);
-        throw new ReferenceError(
+        throw new WhatError(
           `Unexpected token "${String.fromCharCode(buffer[x])}" @ ${x - 255}`,
         );
       }
       default:
-        throw new Error(`Unknown Error Code: ${exit_code}`);
+        throw new WhatError(`Unknown Error Code: ${exit_code}`);
     }
   }
 
-  await Deno.writeFile(".temp.wat", buffer.subarray(addr1, addr2));
-  const { code } = await new Deno.Command(
+  const { stdin, stdout } = new Deno.Command(
     "wat2wasm",
-    { args: ["-o", ".temp.wasm", ".temp.wat"] },
+    {
+      args: ["-o", "/dev/stdout", "/dev/stdin"],
+      stdin: "piped",
+      stdout: "piped",
+    },
   )
-    .spawn()
-    .status;
-  if (code) {
-    throw new Error(`wat2wasm Error Code: ${code}`);
-  }
-  await Deno.remove(".temp.wat");
-  const result = await Deno.readFile(".temp.wasm");
-  await Deno.remove(".temp.wasm");
-  return result;
+    .spawn();
+  const writer = stdin.getWriter();
+  await writer.write(buffer.subarray(addr1, addr2));
+  writer.close();
+  return stdout;
 }
 
 /* Token Enum // 1 Does not appear in array; merely to remove whitespace
