@@ -248,6 +248,8 @@
   )
 
   (func $emitPrimary (param $o i32) (param $addr i32) (result i32)
+    ;; (o)
+
     (local $i i32)
     (local $len i32)
 
@@ -273,6 +275,8 @@
   )
 
   (func $emitUnary (param $o i32) (param $addr i32) (result i32)
+    ;; (o)
+
     (;;) (local.get $o)
     (;;) (call $emit (;;) (i32.load (i32.add (local.get $addr) (i32.const 5))))
     (local.set $o (;;))
@@ -299,6 +303,8 @@
   )
 
   (func $emitFactor (param $o i32) (param $addr i32) (result i32)
+    ;; (o)
+
     (;;) (local.get $o)
     (;;) (call $emit (;;) (i32.load (i32.add (local.get $addr) (i32.const 1))))
     (;;) (call $emit (;;) (i32.load (i32.add (local.get $addr) (i32.const 9))))
@@ -324,6 +330,8 @@
   )
 
   (func $emitTerm (param $o i32) (param $addr i32) (result i32)
+    ;; (o)
+
     (;;) (local.get $o)
     (;;) (call $emit (;;) (i32.load (i32.add (local.get $addr) (i32.const 1))))
     (;;) (call $emit (;;) (i32.load (i32.add (local.get $addr) (i32.const 9))))
@@ -347,6 +355,8 @@
   )
 
   (func $emit (param $o i32) (param $addr i32) (result i32)
+    ;; (o)
+
     (if (i32.eq (i32.load8_u (local.get $addr)) (i32.const 1)) (then
       (return (call $emitPrimary (local.get $o) (local.get $addr)))
     ))
@@ -363,6 +373,8 @@
   )
 
   (func $emitWat (param $root i32) (result i32)
+    ;; (o)
+
     (local $o i32)
 
     (;;) (local.tee $o (call $get_alloc))
