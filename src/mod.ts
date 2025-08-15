@@ -100,19 +100,30 @@ export async function compile(
 
 /* AST Enum
   Primary: {
-    id: i8
+    id: i8 | 1
     token_addr: i32
   }
   Unary: {
-    id: i8
+    id: i8 | 2
     token_addr: i32
     expr_addr: i32
   }
-  Binary: {
-    id: i8
+  Factor: {
+    id: i8 | 3
     expr_addr1: i32
     token_addr: i32
     expr_addr2: i32
+  }
+  Term: {
+    id: i8 | 4
+    expr_addr1: i32
+    token_addr: i32
+    expr_addr2: i32
+  }
+  Scope: {
+    id: i8 | 5
+    size: i8
+    expr_addr(1) .. expr_addr(size): i32
   }
 */
 
@@ -121,4 +132,5 @@ export async function compile(
   1: Syntax Error
   2: Unexpected EOF
   3: Unexpected Token
+  4: Expression Error
 */
