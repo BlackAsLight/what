@@ -1,6 +1,15 @@
 import { compile as c, memory } from "./mod.wasm";
 
 const buffer = new Uint8Array(memory.buffer);
+const view = new DataView(buffer.buffer);
+const decode = function () {
+  const decoder = new TextDecoder();
+  return decoder.decode.bind(decoder);
+}();
+const encodeInto = function () {
+  const encoder = new TextEncoder();
+  return encoder.encodeInto.bind(encoder);
+}();
 
 export class WhatError extends Error {
   constructor(message?: string, options?: ErrorOptions) {
@@ -12,7 +21,7 @@ async function set(
   input: string | Uint8Array | ReadableStream<Uint8Array>,
 ): Promise<number> {
   if (typeof input === "string") {
-    return new TextEncoder().encodeInto(input, buffer.subarray(256)).written;
+    return encodeInto(input, buffer.subarray(256)).written;
   }
   if (input instanceof Uint8Array) {
     buffer.set(input, 256);
@@ -35,6 +44,8 @@ export async function compile(
     number,
   ];
 
+  console.log(buffer.subarray(256));
+
   if (exit_code) {
     switch (exit_code) {
       case 1:
@@ -46,9 +57,10 @@ export async function compile(
       case 2:
         throw new WhatError("Unexpected EOF");
       case 3: {
-        const x = new DataView(buffer.buffer).getUint32(addr1 + 1, true);
+        const x = view.getUint32(addr1 + 1, true);
+        const y = view.getUint32(addr1 + 5, true);
         throw new WhatError(
-          `Unexpected token "${String.fromCharCode(buffer[x])}" @ ${x - 255}`,
+          `Unexpected token "${decode(buffer.subarray(x, y))}" @ ${x - 255}`,
         );
       }
       default:
@@ -79,7 +91,10 @@ export async function compile(
   "*": 4
   "/": 5
   ";": 6
-  "0-9": 7
+  "=": 7
+  "0-9": 100
+  "a-zA-Z": 101
+  "var": 102
 */
 
 /* Token Struct
@@ -117,6 +132,17 @@ export async function compile(
     size: i8
     expr_addr(1) .. expr_addr(size): i32
   }
+  Var: {
+    id: i8 | 6
+    token_addr: i32
+    expr_addr: i32
+  }
+  Assign: {
+    id: i8 | 7
+    identifier_addr: i32
+    token_addr: i32
+    expr_addr: i32
+  }
 */
 
 /* Compiler Response
@@ -124,5 +150,6 @@ export async function compile(
   1: Syntax Error
   2: Unexpected EOF
   3: Unexpected Token
-  4: Expression Error
+  4: Scope Error
+  5: Expected Assign Token
 */
