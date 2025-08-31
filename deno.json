@@ -8,6 +8,10 @@
       "command": "deno test --allow-run='wat2wasm' -R='.' -W='.' --doc",
       "dependencies": ["build"]
     },
+    "run": {
+      "command": "deno run --allow-run='wat2wasm' -RW src/main.ts",
+      "dependencies": ["build"]
+    },
     "compile": {
       "command": "deno compile --allow-run='wat2wasm' -RW --output whatc src/main.ts",
       "dependencies": ["build"]
