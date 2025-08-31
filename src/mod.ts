@@ -79,7 +79,7 @@ export async function compile(
   "*": 4
   "/": 5
   ";": 6
-  "0-9": 7
+  "0-9": 100
 */
 
 /* Token Struct
