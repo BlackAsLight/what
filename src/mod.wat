@@ -141,7 +141,7 @@
     ))
   )
 
-  (func $primary (param $i i32) (param $len i32) (result i32 i32)
+  (func $primary (param $i i32) (result i32 i32)
     ;; (<256 ? error : i, addr)
     (local $addr i32)
 
@@ -169,7 +169,7 @@
 
     (if (i32.ne (i32.load8_u (local.get $i)) (i32.const 2)) (then
       (if (i32.ne (i32.load8_u (local.get $i)) (i32.const 3)) (then
-        (;;) (;;) (call $primary (local.get $i) (local.get $len))
+        (;;) (;;) (call $primary (local.get $i))
         (return (;;) (;;))
       ))
     ))
