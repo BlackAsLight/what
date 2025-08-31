@@ -11,11 +11,11 @@ export { WhatError } from "./mod.ts";
  * const x =
  *   (await import(
  *     "data:application/wasm;base64," +
- *       encodeBase64(await compile("-10 * 15 + 2 - -8 / 2; 10 + 10;"))
+ *       encodeBase64(await compile("var x = 10 + 10; x = 2 * x; +x;"))
  *   ))
- *     .main() as [number, number];
+ *     .main();
  *
- * assertEquals(x, [-144, 20]);
+ * assertEquals(x, 40);
  * ```
  */
 export async function compile(
