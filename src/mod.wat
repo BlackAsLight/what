@@ -145,9 +145,6 @@
     ;; (<256 ? error : i, addr)
     (local $addr i32)
 
-    (if (i32.ge_u (local.get $i) (local.get $len)) (then
-      (return (i32.const 2) (local.get $i))
-    ))
     (if (i32.ne (i32.load8_u (local.get $i)) (i32.const 100)) (then
       (return (i32.const 3) (local.get $i))
     ))
