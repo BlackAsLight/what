@@ -141,10 +141,7 @@
     ))
   )
 
-  (func $primary
-    (param $i i32)
-    (param $len i32)
-    (result i32 i32)
+  (func $primary (param $i i32) (param $len i32) (result i32 i32)
     ;; (<256 ? error : i, addr)
     (local $addr i32)
 
@@ -164,10 +161,7 @@
     (;;) (local.get $addr)
   )
 
-  (func $unary
-    (param $i i32)
-    (param $len i32)
-    (result i32 i32)
+  (func $unary (param $i i32) (param $len i32) (result i32 i32)
     ;; (<256 ? error : i, addr)
     (local $addr i32)
     (local $expr i32)
@@ -204,10 +198,7 @@
     (;;) (local.get $addr)
   )
 
-  (func $factor
-    (param $i i32)
-    (param $len i32)
-    (result i32 i32)
+  (func $factor (param $i i32) (param $len i32) (result i32 i32)
     ;; (<256 ? error : i, addr)
     (local $addr i32)
     (local $expr i32)
@@ -251,10 +242,7 @@
     (;;) (local.get $addr)
   )
 
-  (func $term
-    (param $i i32)
-    (param $len i32)
-    (result i32 i32)
+  (func $term (param $i i32) (param $len i32) (result i32 i32)
     ;; (<256 ? error : i, addr)
     (local $addr i32)
     (local $expr i32)
@@ -298,10 +286,7 @@
     (;;) (local.get $addr)
   )
 
-  (func $expr
-    (param $i i32)
-    (param $len i32)
-    (result i32 i32)
+  (func $expr (param $i i32) (param $len i32) (result i32 i32)
     ;; (<256 ? error : i, addr)
     (local $addr i32)
 
