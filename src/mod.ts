@@ -1,6 +1,6 @@
 import { compile as c, memory } from "./mod.wasm";
 
-const buffer = new Uint8Array(memory.buffer);
+export const buffer = new Uint8Array(memory.buffer);
 const view = new DataView(memory.buffer);
 const decode = function () {
   const decoder = new TextDecoder();
