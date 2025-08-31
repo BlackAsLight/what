@@ -36,14 +36,14 @@
     (global.set $alloc_is_enabled (i32.const 0))
   )
 
-  (data (i32.const 0) "\00\00\00\00\00\00\00\00\00\00\01\00\00\00\00\00")
-  (data (i32.const 16) "\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
-  (data (i32.const 32) "\01\00\00\00\00\00\00\00\00\00\04\02\00\03\00\05")
-  (data (i32.const 48) "\64\64\64\64\64\64\64\64\64\64\00\06\00\00\00\00")
-  (data (i32.const 64) "\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
-  (data (i32.const 80) "\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
-  (data (i32.const 96) "\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
-  (data (i32.const 112) "\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
+  (data (i32.const 0)   "\00\00\00\00\00\00\00\00\00\00\01\00\00\00\00\00")
+  (data (i32.const 16)  "\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
+  (data (i32.const 32)  "\01\00\00\00\00\00\00\00\00\00\04\02\00\03\00\05")
+  (data (i32.const 48)  "\64\64\64\64\64\64\64\64\64\64\00\06\00\00\00\00")
+  (data (i32.const 64)  "\00\65\65\65\65\65\65\65\65\65\65\65\65\65\65\65")
+  (data (i32.const 80)  "\65\65\65\65\65\65\65\65\65\65\65\00\00\00\00\00")
+  (data (i32.const 96)  "\00\65\65\65\65\65\65\65\65\65\65\65\65\65\65\65")
+  (data (i32.const 112) "\65\65\65\65\65\65\65\65\65\65\65\00\00\00\00\00")
   (data (i32.const 128) "\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
   (data (i32.const 144) "\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
   (data (i32.const 160) "\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00")
@@ -73,7 +73,7 @@
         (br $next)
       ))
       (if (i32.ge_u (local.get $char) (i32.const 2)) (then
-        (if (i32.le_u (local.get $char) (i32.const 6)) (then
+        (if (i32.lt_u (local.get $char) (i32.const 100)) (then
           (i32.store8 (local.get $o) (local.get $char))
           (;;) (local.tee $o (i32.add (local.get $o) (i32.const 1)))
           (;;) (local.get $i)
@@ -90,11 +90,9 @@
         (;;) (local.tee $o (i32.add (local.get $o) (i32.const 1)))
         (;;) (local.get $i)
         (i32.store (;;) (;;))
-        (loop $num
+        (loop $x
           (;;) (local.tee $i (i32.add (local.get $i) (i32.const 1)))
-          (br_if $num
-            (i32.eq (i32.load8_u (i32.load8_u (;;))) (i32.const 100))
-          )
+          (br_if $x (i32.eq (i32.load8_u (i32.load8_u (;;))) (i32.const 100)))
         )
         (;;) (local.tee $o (i32.add (local.get $o) (i32.const 4)))
         (;;) (local.get $i)
@@ -102,10 +100,45 @@
         (local.set $o (i32.add (local.get $o) (i32.const 4)))
         (br $next)
       ))
+      (if (i32.eq (local.get $char) (i32.const 101)) (then
+        (;;) (local.get $o) ;; $keyword
+
+        (i32.store8 (local.get $o) (local.get $char))
+        (;;) (local.tee $o (i32.add (local.get $o) (i32.const 1)))
+        (;;) (local.get $i)
+        (i32.store (;;) (;;))
+        (loop $x
+          (;;) (local.tee $i (i32.add (local.get $i) (i32.const 1)))
+          (br_if $x (i32.eq (i32.load8_u (i32.load8_u (;;))) (i32.const 101)))
+        )
+        (;;) (local.tee $o (i32.add (local.get $o) (i32.const 4)))
+        (;;) (local.get $i)
+        (i32.store (;;) (;;))
+        (local.set $o (i32.add (local.get $o) (i32.const 4)))
+
+        (call $keyword (;;)) ;; $keyword
+        (br $next)
+      ))
       unreachable
     )))
     (;;) (i32.const 0)
     (;;) (local.get $o)
+  )
+
+  (func $keyword (param $t i32)
+    (local $i i32)
+
+    (;;) (local.tee $i (i32.load (i32.add (local.get $t) (i32.const 1))))
+    (if (i32.eq (i32.load8_u (;;)) (i32.const 118)) (then
+      (;;) (local.tee $i (i32.add (local.get $i) (i32.const 1)))
+      (if (i32.eq (i32.load8_u (;;)) (i32.const 97)) (then
+        (;;) (local.tee $i (i32.add (local.get $i) (i32.const 1)))
+        (if (i32.eq (i32.load8_u (;;)) (i32.const 114)) (then
+          (i32.store8 (local.get $t) (i32.const 150))
+          (return)
+        ))
+      ))
+    ))
   )
 
   (func $primary

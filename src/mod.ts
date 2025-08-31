@@ -1,6 +1,11 @@
 import { compile as c, memory } from "./mod.wasm";
 
 const buffer = new Uint8Array(memory.buffer);
+const view = new DataView(memory.buffer);
+const decode = function () {
+  const decoder = new TextDecoder();
+  return decoder.decode.bind(decoder);
+}();
 
 export class WhatError extends Error {
   constructor(message?: string, options?: ErrorOptions) {
@@ -39,16 +44,20 @@ export async function compile(
     switch (exit_code) {
       case 1:
         throw new WhatError(
-          `Unexpected character "${String.fromCharCode(buffer[addr1])}" @ ${
-            addr1 - 255
-          }`,
+          `Unexpected character "${
+            decode(buffer.subarray(addr1, addr1 + 1))
+          }" @ byte ${addr1 - 255}`,
         );
       case 2:
         throw new WhatError("Unexpected EOF");
       case 3: {
-        const x = new DataView(buffer.buffer).getUint32(addr1 + 1, true);
+        const token = view.getUint8(addr1);
+        const start_addr = view.getUint32(addr1 + 1, true);
+        const end_addr = view.getUint32(addr1 + 5, true);
         throw new WhatError(
-          `Unexpected token "${String.fromCharCode(buffer[x])}" @ ${x - 255}`,
+          `Unexpected token (ID: ${token}) "${
+            decode(buffer.subarray(start_addr, end_addr))
+          }" @ byte ${start_addr - 255}`,
         );
       }
       default:
@@ -79,7 +88,10 @@ export async function compile(
   "*": 4
   "/": 5
   ";": 6
+  "=": 50
   "0-9": 100
+  "a-zA-Z": 101
+  "var": 150
 */
 
 /* Token Struct
