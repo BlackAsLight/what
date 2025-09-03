@@ -46,7 +46,7 @@ export async function compile(
         throw new WhatError(
           `Unexpected character "${
             decode(buffer.subarray(addr1, addr1 + 1))
-          }" @ byte ${addr1 - 1023}`,
+          }" @ byte ${addr1 - 1024}`,
         );
       case 2:
         throw new WhatError("Unexpected EOF");
@@ -54,15 +54,24 @@ export async function compile(
         const token = view.getUint8(addr1);
         const start_addr = view.getUint32(addr1 + 1, true);
         const end_addr = view.getUint32(addr1 + 5, true);
+        console.log(
+          exit_code,
+          addr1,
+          addr2,
+          token,
+          start_addr,
+          end_addr,
+          buffer.subarray(addr1),
+        );
         throw new WhatError(
           `Unexpected token (ID: ${token}) "${
             decode(buffer.subarray(start_addr, end_addr))
-          }" @ byte ${start_addr - 1023}`,
+          }" @ byte ${start_addr - 1024}`,
         );
       }
       case 4:
         throw new WhatError(
-          `Too Many Expressions Starting @ byte ${addr1 - 1023}. Max 256/Scope`,
+          `Too Many Expressions Starting @ byte ${addr1 - 1024}. Max 256/Scope`,
         );
       case 5:
         throw new WhatError(
@@ -71,9 +80,8 @@ export async function compile(
           }`,
         );
       case 6: {
-        const token_addr = view.getUint32(addr1 + 1, true);
-        const start_addr = view.getUint32(token_addr + 1, true);
-        const end_addr = view.getUint32(token_addr + 5, true);
+        const start_addr = view.getUint32(addr1 + 1, true);
+        const end_addr = view.getUint32(addr1 + 5, true);
         throw new WhatError(
           `Variable "${
             decode(buffer.subarray(start_addr, end_addr))
@@ -81,9 +89,8 @@ export async function compile(
         );
       }
       case 7: {
-        const token_addr = view.getUint32(addr1 + 1, true);
-        const start_addr = view.getUint32(token_addr + 1, true);
-        const end_addr = view.getUint32(token_addr + 5, true);
+        const start_addr = view.getUint32(addr1 + 1, true);
+        const end_addr = view.getUint32(addr1 + 5, true);
         throw new WhatError(
           `Variable "${
             decode(buffer.subarray(start_addr, end_addr))
@@ -163,14 +170,16 @@ export async function compile(
   }
   Var: {
     id: i8 | 6
-    token_addr: i32
-    assign_addr: i32
+    var_token_addr: i32
+    identifier_token_addr: i32
+    assign_token_addr: i32
+    expr_addr: i32
   }
   Assign: {
     id: i8 | 7
-    identifier_addr: i32
+    expr_addr1: i32
     token_addr: i32
-    expr_addr: i32
+    expr_addr2: i32
   }
   Identifier: {
     id: i8 | 8

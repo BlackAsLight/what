@@ -11,7 +11,7 @@ export { WhatError } from "./mod.ts";
  * const x =
  *   (await import(
  *     "data:application/wasm;base64," +
- *       encodeBase64(await compile("var x = 10 + 10; x = 2 * x; +x;"))
+ *       encodeBase64(await compile("var x = 10 + 10; x = 2 * x; x;"))
  *   ))
  *     .main();
  *
