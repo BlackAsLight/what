@@ -128,6 +128,13 @@ export async function compile(
   "/": 5
   ";": 6
   "=": 50
+  "==": 51
+  "!": 52
+  "!=": 53
+  "<": 54
+  "<=": 55
+  ">": 56
+  ">=": 57
   "0-9": 100
   "a-zA-Z": 101
   "var": 150
@@ -195,6 +202,12 @@ export async function compile(
   Identifier: {
     id: i8 | 8
     token_addr: i32
+  }
+  Compare: {
+    id: i8 | 9
+    expr_addr1: i32
+    token_addr: i32
+    expr_addr2: i32
   }
 */
 
