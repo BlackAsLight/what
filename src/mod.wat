@@ -28,50 +28,56 @@
   )
 
   (global $var_end (mut i32) (i32.const 256))
-  (func $add_var (param $t i32) (result i32)
+  (func $add_var (param $type i32) (param $token i32) (result i32)
+    ;; (had_error)
+
     (if (i32.ge_u (global.get $var_end) (i32.const 1024)) (then
       (return (i32.const 1))
     ))
 
-    (i32.store (global.get $var_end) (local.get $t))
-    (global.set $var_end (i32.add (global.get $var_end) (i32.const 4)))
+    (i32.store16 (global.get $var_end) (local.get $type))
+    (i32.store (i32.add (global.get $var_end) (i32.const 2)) (local.get $token))
+    (global.set $var_end (i32.add (global.get $var_end) (i32.const 6)))
 
     (;;) (i32.const 0)
   )
 
-  (func $has_var (param $t1 i32) (result i32)
+  (func $has_var (param $type i32) (param $token i32) (result i32)
     (local $i i32)
     (local $len i32)
-    (local $t2 i32)
+    (local $t i32)
 
     (local.set $i (i32.const 256))
-    (local.set $len (call $var_length (local.get $t1)))
+    (local.set $len (call $var_length (local.get $token)))
 
     (loop $next (if (i32.lt_u (local.get $i) (global.get $var_end)) (then
-      (local.set $t2 (i32.load (local.get $i)))
-      (;;) (call $var_length (local.get $t2))
-      (if (i32.eq (;;) (local.get $len)) (then
-        (;;) (call $var_is_equal
-          (i32.load (i32.add (local.get $t1) (i32.const 1)))
-          (i32.load (i32.add (local.get $t2) (i32.const 1)))
-          (local.get $len)
-        )
-        (if (;;) (then
-          (return (i32.const 1))
+      (if (i32.eq (i32.load16_u (local.get $i)) (local.get $type)) (then
+        (;;) (local.tee $t (i32.load (i32.add (local.get $i) (i32.const 2))))
+        (if (i32.eq (call $var_length (;;)) (local.get $len)) (then
+          (;;) (call $var_is_equal
+            (i32.load (i32.add (local.get $token) (i32.const 1)))
+            (i32.load (i32.add (local.get $t) (i32.const 1)))
+            (local.get $len)
+          )
+          (if (;;) (then
+            (return (i32.const 1))
+          ))
         ))
       ))
 
-      (local.set $i (i32.add (local.get $i) (i32.const 4)))
+      (local.set $i (i32.add (local.get $i) (i32.const 6)))
       (br $next)
     )))
 
     (;;) (i32.const 0)
   )
 
-  (func $var_length (param $t i32) (result i32)
+  (func $var_length (param $token i32) (result i32)
+    ;; (len)
+
     (;;) (i32.sub
-      (i32.load (i32.add (local.get $t) (i32.const 5)))
-      (i32.load (i32.add (local.get $t) (i32.const 1)))
+      (i32.load (i32.add (local.get $token) (i32.const 5)))
+      (i32.load (i32.add (local.get $token) (i32.const 1)))
     )
   )
 
@@ -217,7 +223,7 @@
     (i32.store (i32.add (local.get $addr) (i32.const 1)) (local.get $i))
       ;; token_addr
 
-    (if (i32.eqz (call $has_var (local.get $i))) (then
+    (if (i32.eqz (call $has_var (i32.const 1) (local.get $i))) (then
       (return (i32.const 0) (i32.const 7) (local.get $i))
     ))
 
@@ -450,10 +456,10 @@
     (if (i32.ne (i32.load8_u (local.get $i)) (i32.const 101)) (then
       (return (i32.const 3) (local.get $i))
     ))
-    (if (call $has_var (local.get $i)) (then
+    (if (call $has_var (i32.const 1) (local.get $i)) (then
       (return (i32.const 6) (local.get $i))
     ))
-    (if (call $add_var (local.get $i)) (then
+    (if (call $add_var (i32.const 1) (local.get $i)) (then
       (return (i32.const 8) (local.get $i))
     ))
     (i32.store (i32.add (local.get $addr) (i32.const 5)) (local.get $i))

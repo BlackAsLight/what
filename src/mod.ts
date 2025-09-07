@@ -141,6 +141,17 @@ export async function compile(
   }
 */
 
+/* Identifier Enum
+  int: 1
+*/
+
+/* Identifier Struct
+  {
+    type: i16
+    token: i32
+  }
+*/
+
 /* AST Enum
   Primary: {
     id: i8 | 1
