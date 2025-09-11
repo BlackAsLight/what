@@ -99,6 +99,8 @@ export async function compile(
       }
       case 8:
         throw new WhatError("Variable Existence for Scope hit. (Max: 192)");
+      case 9:
+        throw new WhatError("Unexpected Type Received in Expression");
       default:
         throw new WhatError(`Unknown Error Code: ${exit_code}`);
     }
