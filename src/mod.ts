@@ -69,10 +69,6 @@ export async function compile(
           }" @ byte ${start_addr - 1024}`,
         );
       }
-      case 4:
-        throw new WhatError(
-          `Too Many Expressions Starting @ byte ${addr1 - 1024}. Max 256/Scope`,
-        );
       case 5:
         throw new WhatError(
           `Expected Assignment Expression. Expression ID Found: ${
@@ -191,8 +187,11 @@ export async function compile(
   }
   Scope: {
     id: i8 | 5
-    size: i8
-    expr_addr(1) .. expr_addr(size): i32
+    node_addr: i32 | Node?
+  }
+  Node: {
+    node_addr: i32 | Node?
+    expr_addr: i32
   }
   Var: {
     id: i8 | 6
@@ -224,7 +223,6 @@ export async function compile(
   1: Syntax Error
   2: Unexpected EOF
   3: Unexpected Token
-  4: Expression Error
   5: Declaration Error
   6: Variable Already Exists Error
   7: Variable Doesn't Exist Error
