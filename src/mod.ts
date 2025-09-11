@@ -159,6 +159,12 @@ export async function compile(
   }
 */
 
+/* Type Enum
+  0: No Type
+  1: Boolean
+  2: i32
+*/
+
 /* AST Enum
   Primary: {
     id: i8 | 1
@@ -221,4 +227,5 @@ export async function compile(
   6: Variable Already Exists Error
   7: Variable Doesn't Exist Error
   8: Too Many Varaibles Exist Error
+  9: Received Wrong Type
 */
