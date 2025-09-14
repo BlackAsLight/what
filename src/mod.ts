@@ -1,7 +1,7 @@
 import { compile as c, memory } from "./mod.wasm";
 
 export const buffer = new Uint8Array(memory.buffer);
-const view = new DataView(memory.buffer);
+export const view = new DataView(memory.buffer);
 const decode = function () {
   const decoder = new TextDecoder();
   return decoder.decode.bind(decoder);
@@ -166,27 +166,32 @@ export async function compile(
 /* AST Enum
   Primary: {
     id: i8 | 1
+    type: i8
     token_addr: i32
   }
   Unary: {
     id: i8 | 2
+    type: i8
     token_addr: i32
     expr_addr: i32
   }
   Factor: {
     id: i8 | 3
+    type: i8
     expr_addr1: i32
     token_addr: i32
     expr_addr2: i32
   }
   Term: {
     id: i8 | 4
+    type: i8
     expr_addr1: i32
     token_addr: i32
     expr_addr2: i32
   }
   Scope: {
     id: i8 | 5
+    type: i8
     node_addr: i32 | Node?
   }
   Node: {
@@ -195,6 +200,7 @@ export async function compile(
   }
   Var: {
     id: i8 | 6
+    type: i8
     var_token_addr: i32
     identifier_token_addr: i32
     assign_token_addr: i32
@@ -202,16 +208,19 @@ export async function compile(
   }
   Assign: {
     id: i8 | 7
+    type: i8
     expr_addr1: i32
     token_addr: i32
     expr_addr2: i32
   }
   Identifier: {
     id: i8 | 8
+    type: i8
     token_addr: i32
   }
   Compare: {
     id: i8 | 9
+    type: i8
     expr_addr1: i32
     token_addr: i32
     expr_addr2: i32
