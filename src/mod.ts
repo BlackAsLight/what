@@ -146,14 +146,11 @@ export async function compile(
   }
 */
 
-/* Identifier Enum
-  int: 1
-*/
-
-/* Identifier Struct
-  {
-    type: i16
-    token: i32
+/* Memory Structure
+  Range: 256 - 1024
+  Struct: {
+    type: i8
+    expr_addr: i32
   }
 */
 

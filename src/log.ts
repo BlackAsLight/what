@@ -1,3 +1,4 @@
+// deno-lint-ignore-file ban-unused-ignore
 // deno-lint-ignore no-unused-vars verbatim-module-syntax
 import { buffer, view } from "./mod.ts";
 
