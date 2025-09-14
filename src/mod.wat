@@ -632,7 +632,11 @@
     (;;) (local.get $addr)
   )
 
-  (func $expr (param $i i32) (param $len i32) (result i32 i32)
+  (func $expr
+    (param $i i32)
+    (param $len i32)
+    (param $t_deli_id i32)
+    (result i32 i32)
     ;; (<1024 ? error : i, addr)
     (local $addr i32)
 
@@ -646,7 +650,7 @@
     (if (i32.ge_u (local.get $i) (local.get $len)) (then
       (return (i32.const 2) (local.get $i))
     ))
-    (if (i32.ne (i32.load8_u (local.get $i)) (i32.const 6)) (then
+    (if (i32.ne (i32.load8_u (local.get $i)) (local.get $t_deli_id)) (then
       (return (i32.const 3) (local.get $i))
     ))
 
@@ -654,38 +658,74 @@
     (;;) (local.get $addr)
   )
 
+  (func $node
+    (param $i i32)
+    (param $len i32)
+    (param $t_end_id i32)
+    (param $t_deli_id i32)
+    (result i32 i32)
+    ;; (<1024 ? error : i, addr)
+    (local $addr i32)
+    (local $expr i32)
+
+    (if (i32.ge_u (local.get $i) (local.get $len)) (then
+      (return (local.get $i) (i32.const 0))
+    ))
+    (if (i32.eq (i32.load8_u (local.get $i)) (local.get $t_end_id)) (then
+      (return (local.get $i) (i32.const 0))
+    ))
+
+    (;;) (;;) (call $expr
+      (local.get $i)
+      (local.get $len)
+      (local.get $t_deli_id)
+    )
+    (local.set $expr (;;))
+    (;;) (local.tee $i (;;))
+    (if (i32.lt_u (;;) (i32.const 1024)) (then
+      (return (local.get $i) (local.get $expr))
+    ))
+
+    (;;) (local.tee $addr (call $alloc (i32.const 8)))
+    (i32.store (i32.add (;;) (i32.const 4)) (local.get $expr)) ;; expr_addr
+
+    (;;) (;;) (call $node
+      (local.get $i)
+      (local.get $len)
+      (local.get $t_end_id)
+      (local.get $t_deli_id)
+    )
+    (local.set $expr (;;))
+    (;;) (local.tee $i (;;))
+    (if (i32.lt_u (;;) (i32.const 1024)) (then
+      (return (local.get $i) (local.get $expr))
+    ))
+    (i32.store (local.get $addr) (local.get $expr)) ;; node_addr
+
+    (;;) (local.get $i)
+    (;;) (local.get $addr)
+  )
+
   (func $scope (param $i i32) (param $len i32) (result i32 i32)
     ;; (<1024 ? error : i, addr)
     (local $addr i32)
-    (local $last_node i32)
-    (local $node i32)
     (local $expr i32)
-    (local $x i32)
+
+    (;;) (;;) (call $node
+      (local.get $i)
+      (local.get $len)
+      (i32.const 0)
+      (i32.const 6)
+    )
+    (local.set $expr (;;))
+    (;;) (local.tee $i (;;))
+    (if (i32.lt_u (;;) (i32.const 1024)) (then
+      (return (local.get $i) (local.get $expr))
+    ))
 
     (;;) (local.tee $addr (call $alloc (i32.const 5)))
     (i32.store8 (;;) (i32.const 5)) ;; id
-    (local.set $last_node (i32.add (local.get $addr) (i32.const 1)))
-
-    (block $break (loop $next
-      (br_if $break (i32.ge_u (local.get $i) (local.get $len)))
-      (;;) (;;) (call $expr (local.get $i) (local.get $len))
-      (local.set $expr (;;))
-      (;;) (local.tee $x (;;))
-      (if (i32.lt_u (;;) (i32.const 1024)) (then
-        (br_if $break (i32.eq (local.get $x) (i32.const 4)))
-        (return (local.get $x) (local.get $expr))
-      ) (else
-        (local.set $i (local.get $x))
-      ))
-
-      (;;) (local.tee $node (call $alloc (i32.const 8)))
-      (i32.store (i32.add (;;) (i32.const 4)) (local.get $expr)) ;; expr_addr
-      (i32.store (local.get $last_node) (local.get $node)) ;; node_addr
-      (local.set $last_node (local.get $node))
-
-      (br $next)
-    ))
-    (i32.store (local.get $last_node) (i32.const 0)) ;; node_addr
+    (i32.store (i32.add (local.get $addr) (i32.const 1)) (local.get $expr))
 
     (;;) (local.get $i)
     (;;) (local.get $addr)
