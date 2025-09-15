@@ -67,7 +67,7 @@
       (local.set $mem (i32.load (local.get $i)))
       (if (i32.eq (i32.load8_u (local.get $mem)) (i32.const 1)) (then
         (;;) (i32.load (i32.add (local.get $mem) (i32.const 1)))
-        (;;) (i32.load (i32.add (;;) (i32.const 6)))
+        (;;) (i32.load (i32.add (;;) (i32.const 2)))
         (local.set $t (;;))
         (;;) (i32.sub
           (i32.add (local.get $t) (i32.const 5))
@@ -582,11 +582,9 @@
       (return (;;) (;;))
     ))
 
-    (;;) (local.tee $addr (call $alloc (i32.const 18)))
+    (;;) (local.tee $addr (call $alloc (i32.const 10)))
     (i32.store8 (;;) (i32.const 6)) ;; id
     (i32.store8 (i32.add (local.get $addr) (i32.const 1)) (i32.const 0)) ;; type
-    (i32.store (i32.add (local.get $addr) (i32.const 2)) (local.get $i))
-      ;; var_token_addr
 
     (;;) (local.tee $i (i32.add (local.get $i) (i32.const 9)))
     (if (i32.ge_u (;;) (local.get $len)) (then
@@ -601,7 +599,7 @@
     (if (call $mem_set_var (local.get $addr)) (then
       (return (i32.const 8) (local.get $i))
     ))
-    (i32.store (i32.add (local.get $addr) (i32.const 6)) (local.get $i))
+    (i32.store (i32.add (local.get $addr) (i32.const 2)) (local.get $i))
       ;; identifier_token_addr
 
     (;;) (local.tee $i (i32.add (local.get $i) (i32.const 9)))
@@ -611,8 +609,6 @@
     (if (i32.ne (i32.load8_u (local.get $i)) (i32.const 50)) (then
       (return (i32.const 3) (local.get $i))
     ))
-    (i32.store (i32.add (local.get $addr) (i32.const 10)) (local.get $i))
-      ;; assign_token_addr
 
     (;;) (local.tee $i (i32.add (local.get $i) (i32.const 9)))
     (if (i32.ge_u (;;) (local.get $len)) (then
@@ -629,7 +625,7 @@
     (if (i32.ne (i32.load8_u (;;)) (i32.const 2)) (then
       (return (i32.const 9) (local.get $expr))
     ))
-    (i32.store (i32.add (local.get $addr) (i32.const 14)) (local.get $expr))
+    (i32.store (i32.add (local.get $addr) (i32.const 6)) (local.get $expr))
       ;; expr_addr
 
     (;;) (local.get $i)
@@ -931,7 +927,7 @@
 
     (;;) (call $emitExpr
       (local.get $o)
-      (i32.load (i32.add (local.get $addr) (i32.const 14)))
+      (i32.load (i32.add (local.get $addr) (i32.const 6)))
     )
 
     (;;) (call $w4 (;;) (i32.const 1668246560)) ;; " loc"
@@ -940,7 +936,7 @@
 
     (;;) (call $emitToken
       (;;)
-      (i32.load (i32.add (local.get $addr) (i32.const 6)))
+      (i32.load (i32.add (local.get $addr) (i32.const 2)))
     )
   )
 
@@ -1009,7 +1005,7 @@
         (;;) (call $w4 (;;) (i32.const 606104673)) ;; al $
         (;;) (call $emitToken
           (;;)
-          (i32.load (i32.add (local.get $expr) (i32.const 6)))
+          (i32.load (i32.add (local.get $expr) (i32.const 2)))
         )
         (;;) (call $w4 (;;) (i32.const 842230048)) ;; " i32"
         (;;) (call $w1 (;;) (i32.const 41)) ;; )

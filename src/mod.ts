@@ -198,9 +198,7 @@ export async function compile(
   Var: {
     id: i8 | 6
     type: i8
-    var_token_addr: i32
     identifier_token_addr: i32
-    assign_token_addr: i32
     expr_addr: i32
   }
   Assign: {
