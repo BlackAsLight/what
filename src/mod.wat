@@ -512,13 +512,19 @@
     (;;) (local.get $addr)
   )
 
+  (func $expr (param $i i32) (param $len i32) (result i32 i32 i32)
+    ;; (isAssignable, <1024 ? error : i, addr)
+
+    (;;) (;;) (;;) (call $compare (local.get $i) (local.get $len))
+  )
+
   (func $assign (param $i i32) (param $len i32) (result i32 i32)
     ;; (<1024 ? error : i, addr)
     (local $addr i32)
     (local $expr i32)
     (local $type i32)
 
-    (;;) (;;) (;;) (call $compare (local.get $i) (local.get $len))
+    (;;) (;;) (;;) (call $expr (local.get $i) (local.get $len))
     (local.set $expr (;;))
     (;;) (local.tee $i (;;))
     (if (i32.lt_u (;;) (i32.const 1024)) (then
@@ -548,7 +554,7 @@
     (if (i32.ge_u (;;) (local.get $len)) (then
       (return (i32.const 2) (local.get $i))
     ))
-    (;;) (;;) (;;) (call $compare (local.get $i) (local.get $len))
+    (;;) (;;) (;;) (call $expr (local.get $i) (local.get $len))
     (local.set $expr (;;))
     (;;) (local.tee $i (;;))
     (if (i32.lt_u (;;) (i32.const 1024)) (then
@@ -612,7 +618,7 @@
     (if (i32.ge_u (;;) (local.get $len)) (then
       (return (i32.const 2) (local.get $i))
     ))
-    (;;) (;;) (;;) (call $compare (local.get $i) (local.get $len))
+    (;;) (;;) (;;) (call $expr (local.get $i) (local.get $len))
     (local.set $expr (;;))
     (;;) (local.tee $i (;;))
     (if (i32.lt_u (;;) (i32.const 1024)) (then
@@ -630,11 +636,7 @@
     (;;) (local.get $addr)
   )
 
-  (func $expr
-    (param $i i32)
-    (param $len i32)
-    (param $t_deli_id i32)
-    (result i32 i32)
+  (func $stmt (param $i i32) (param $len i32) (result i32 i32)
     ;; (<1024 ? error : i, addr)
     (local $addr i32)
 
@@ -648,7 +650,7 @@
     (if (i32.ge_u (local.get $i) (local.get $len)) (then
       (return (i32.const 2) (local.get $i))
     ))
-    (if (i32.ne (i32.load8_u (local.get $i)) (local.get $t_deli_id)) (then
+    (if (i32.ne (i32.load8_u (local.get $i)) (i32.const 6)) (then
       (return (i32.const 3) (local.get $i))
     ))
 
@@ -659,8 +661,6 @@
   (func $node
     (param $i i32)
     (param $len i32)
-    (param $t_end_id i32)
-    (param $t_deli_id i32)
     (result i32 i32)
     ;; (<1024 ? error : i, addr)
     (local $addr i32)
@@ -669,15 +669,8 @@
     (if (i32.ge_u (local.get $i) (local.get $len)) (then
       (return (local.get $i) (i32.const 0))
     ))
-    (if (i32.eq (i32.load8_u (local.get $i)) (local.get $t_end_id)) (then
-      (return (local.get $i) (i32.const 0))
-    ))
 
-    (;;) (;;) (call $expr
-      (local.get $i)
-      (local.get $len)
-      (local.get $t_deli_id)
-    )
+    (;;) (;;) (call $stmt (local.get $i) (local.get $len))
     (local.set $expr (;;))
     (;;) (local.tee $i (;;))
     (if (i32.lt_u (;;) (i32.const 1024)) (then
@@ -687,12 +680,7 @@
     (;;) (local.tee $addr (call $alloc (i32.const 8)))
     (i32.store (i32.add (;;) (i32.const 4)) (local.get $expr)) ;; expr_addr
 
-    (;;) (;;) (call $node
-      (local.get $i)
-      (local.get $len)
-      (local.get $t_end_id)
-      (local.get $t_deli_id)
-    )
+    (;;) (;;) (call $node (local.get $i) (local.get $len))
     (local.set $expr (;;))
     (;;) (local.tee $i (;;))
     (if (i32.lt_u (;;) (i32.const 1024)) (then
@@ -709,12 +697,7 @@
     (local $addr i32)
     (local $expr i32)
 
-    (;;) (;;) (call $node
-      (local.get $i)
-      (local.get $len)
-      (i32.const 0)
-      (i32.const 6)
-    )
+    (;;) (;;) (call $node (local.get $i) (local.get $len))
     (local.set $expr (;;))
     (;;) (local.tee $i (;;))
     (if (i32.lt_u (;;) (i32.const 1024)) (then
