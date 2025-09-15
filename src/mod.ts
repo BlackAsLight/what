@@ -205,7 +205,6 @@ export async function compile(
     id: i8 | 7
     type: i8
     expr_addr1: i32
-    token_addr: i32
     expr_addr2: i32
   }
   Identifier: {
