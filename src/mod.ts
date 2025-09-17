@@ -125,6 +125,12 @@ export async function compile(
   "*": 4
   "/": 5
   ";": 6
+  ":": 7
+  "(": 8
+  ")": 9
+  "{": 10
+  "}": 11
+  ",": 12
   "=": 50
   "==": 51
   "!": 52
@@ -133,9 +139,11 @@ export async function compile(
   "<=": 55
   ">": 56
   ">=": 57
-  "0-9": 100
-  "a-zA-Z": 101
+  "[0-9]+": 100
+  "[a-zA-Z][a-zA-Z0-9]*": 101
   "var": 150
+  "func": 151
+  "i32": 200
 */
 
 /* Token Struct
@@ -161,6 +169,10 @@ export async function compile(
 */
 
 /* AST Enum
+  Node: {
+    node_addr: i32 | Node?
+    expr_addr: i32
+  }
   Primary: {
     id: i8 | 1
     type: i8
@@ -186,14 +198,10 @@ export async function compile(
     token_addr: i32
     expr_addr2: i32
   }
-  Scope: {
+  Root: {
     id: i8 | 5
     type: i8
     node_addr: i32 | Node?
-  }
-  Node: {
-    node_addr: i32 | Node?
-    expr_addr: i32
   }
   Var: {
     id: i8 | 6
@@ -219,6 +227,25 @@ export async function compile(
     token_addr: i32
     expr_addr2: i32
   }
+  Function: {
+    id: i8 | 10
+    type: i8
+    identifier_token_addr: i32
+    argument_node_addr: i32 | Node?
+    return_type: i8
+    body_node_addr: i32 | Node?
+  }
+  Argument: {
+    id: i8 | 11
+    type: i8
+    identifier_token_addr: i32
+  }
+  Call: {
+    id: i8 | 12
+    type: i8
+    identifier_token_addr: i32
+    parameter_node_addr: i32 | Node?
+  }
 */
 
 /* Compiler Response
@@ -227,8 +254,8 @@ export async function compile(
   2: Unexpected EOF
   3: Unexpected Token
   5: Declaration Error
-  6: Variable Already Exists Error
-  7: Variable Doesn't Exist Error
-  8: Too Many Varaibles Exist Error
+  6: Reference Already Exists Error
+  7: Reference Doesn't Exist Error
+  8: Too Many Refereces Exist Error
   9: Received Wrong Type
 */
