@@ -2,18 +2,30 @@
   "name": "@what/lang",
   "version": "0.1.0",
   "exports": "./src/lib.ts",
+  "permissions": {
+    "default": {
+      "read": ["."],
+      "write": { "allow": ["."], "deny": ["./deno.json"] },
+      "run": ["wat2wasm"]
+    },
+    "compile": {
+      "read": true,
+      "write": true,
+      "run": ["wat2wasm"]
+    }
+  },
   "tasks": {
     "build": "wat2wasm --debug-names -o src/mod.wasm src/mod.wat",
     "test": {
-      "command": "deno test --allow-run='wat2wasm' -R='.' -W='.' --doc",
+      "command": "deno test -P --doc",
       "dependencies": ["build"]
     },
     "run": {
-      "command": "deno run --allow-run='wat2wasm' -RW src/main.ts",
+      "command": "deno run -P src/main.ts",
       "dependencies": ["build"]
     },
     "compile": {
-      "command": "deno compile --allow-run='wat2wasm' -RW --output whatc src/main.ts",
+      "command": "deno compile -P=compile --output whatc src/main.ts",
       "dependencies": ["build"]
     }
   },
