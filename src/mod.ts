@@ -157,8 +157,9 @@ export async function compile(
 /* Memory Structure
   Range: 256 - 1024
   Struct: {
+    id: i8
     type: i8
-    expr_addr: i32
+    identifier_token_addr: i32
   }
 */
 
@@ -203,7 +204,7 @@ export async function compile(
     type: i8
     node_addr: i32 | Node?
   }
-  Var: {
+  Variable: {
     id: i8 | 6
     type: i8
     identifier_token_addr: i32
@@ -243,7 +244,7 @@ export async function compile(
   Call: {
     id: i8 | 12
     type: i8
-    identifier_token_addr: i32
+    identifier_addr: i32
     parameter_node_addr: i32 | Node?
   }
 */
