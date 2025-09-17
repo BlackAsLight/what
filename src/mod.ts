@@ -143,6 +143,7 @@ export async function compile(
   "[a-zA-Z][a-zA-Z0-9]*": 101
   "var": 150
   "func": 151
+  "export": 152
   "i32": 200
 */
 
@@ -235,6 +236,7 @@ export async function compile(
     argument_node_addr: i32 | Node?
     return_type: i8
     body_node_addr: i32 | Node?
+    exported: i8
   }
   Argument: {
     id: i8 | 11

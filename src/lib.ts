@@ -8,14 +8,22 @@ export { WhatError } from "./mod.ts";
  * import { encodeBase64 } from "@std/encoding/unstable-base64";
  * import { compile } from "@what/lang";
  *
+ * const input = "\
+ * export func main(a: i32, b: i32): i32 {\
+ *   var c = a + b;\
+ *   c = c * 3;\
+ *   c;\
+ * }\
+ * ";
+ *
  * const x =
  *   (await import(
  *     "data:application/wasm;base64," +
- *       encodeBase64(await compile("var x = 10 + 10; x = 2 * x; x;"))
+ *       encodeBase64(await compile(input))
  *   ))
- *     .main();
+ *     .main(2, 7);
  *
- * assertEquals(x, 40);
+ * assertEquals(x, 27);
  * ```
  */
 export async function compile(
