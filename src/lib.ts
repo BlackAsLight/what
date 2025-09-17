@@ -28,6 +28,8 @@ export { WhatError } from "./mod.ts";
  */
 export async function compile(
   input: string | Uint8Array | ReadableStream<Uint8Array>,
+  raw = false,
 ): Promise<Uint8Array<ArrayBuffer>> {
-  return await new Response(await c(input)).bytes() as Uint8Array<ArrayBuffer>;
+  return await new Response(await c(input, raw))
+    .bytes() as Uint8Array<ArrayBuffer>;
 }

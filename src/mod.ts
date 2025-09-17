@@ -33,6 +33,7 @@ async function set(
 
 export async function compile(
   input: string | Uint8Array | ReadableStream<Uint8Array>,
+  raw: boolean,
 ): Promise<ReadableStream<Uint8Array>> {
   const [exit_code, addr1, addr2] = c(await set(input)) as unknown as [
     number,
@@ -101,6 +102,8 @@ export async function compile(
         throw new WhatError(`Unknown Error Code: ${exit_code}`);
     }
   }
+
+  if (raw) return ReadableStream.from([buffer.subarray(addr1, addr2)]);
 
   const { stdin, stdout } = new Deno.Command(
     "wat2wasm",

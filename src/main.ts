@@ -2,7 +2,7 @@ import { extname } from "@std/path/extname";
 import { parseArgs } from "@std/cli/parse-args";
 import { compile, WhatError } from "./mod.ts";
 
-const args = parseArgs(Deno.args);
+const args = parseArgs(Deno.args, { boolean: ["raw"] });
 if (!args._.length) {
   throw new WhatError("Incorrect Usage: Expected input path");
 }
@@ -12,7 +12,7 @@ const outputPath = args._[1]?.toString() ??
   (extname(inputPath) === ".what"
       ? inputPath.substring(0, inputPath.length - 5)
       : inputPath) +
-    ".wasm";
+    (args.raw ? ".wat" : ".wasm");
 
-await (await compile((await Deno.open(inputPath)).readable))
+await (await compile((await Deno.open(inputPath)).readable, args.raw))
   .pipeTo((await Deno.create(outputPath)).writable);
