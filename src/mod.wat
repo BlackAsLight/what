@@ -218,7 +218,18 @@
     (;;) (local.tee $i (i32.load (i32.add (local.get $t) (i32.const 1))))
     (if (i32.eq (i32.load8_u (;;)) (i32.const 101)) (then
       (;;) (local.tee $i (i32.add (local.get $i) (i32.const 1)))
-      (if (i32.eq (i32.load8_u (;;)) (i32.const 120)) (then
+      (if (i32.eq (i32.load8_u (;;)) (i32.const 108)) (then
+        (;;) (local.tee $i (i32.add (local.get $i) (i32.const 1)))
+        (if (i32.eq (i32.load8_u (;;)) (i32.const 115)) (then
+          (;;) (local.tee $i (i32.add (local.get $i) (i32.const 1)))
+          (if (i32.eq (i32.load8_u (;;)) (i32.const 101)) (then
+            (;;) (local.tee $i (i32.add (local.get $i) (i32.const 1)))
+            (if (i32.eq (;;) (local.get $len)) (then
+              (i32.store8 (local.get $t) (i32.const 154))
+            ))
+          ))
+        ))
+      ) (else (if (i32.eq (i32.load8_u (local.get $i)) (i32.const 120)) (then
         (;;) (local.tee $i (i32.add (local.get $i) (i32.const 1)))
         (if (i32.eq (i32.load8_u (;;)) (i32.const 112)) (then
           (;;) (local.tee $i (i32.add (local.get $i) (i32.const 1)))
@@ -235,7 +246,7 @@
             ))
           ))
         ))
-      ))
+      ))))
     ) (else (if (i32.eq (i32.load8_u (local.get $i)) (i32.const 102)) (then
       (;;) (local.tee $i (i32.add (local.get $i) (i32.const 1)))
       (if (i32.eq (i32.load8_u (;;)) (i32.const 117)) (then
@@ -260,7 +271,12 @@
             (i32.store8 (local.get $t) (i32.const 200))
           ))
         ))
-      ))
+      ) (else (if (i32.eq (i32.load8_u (local.get $i)) (i32.const 102)) (then
+        (;;) (local.tee $i (i32.add (local.get $i) (i32.const 1)))
+        (if (i32.eq (;;) (local.get $len)) (then
+          (i32.store8 (local.get $t) (i32.const 153))
+        ))
+      ))))
     ) (else (if (i32.eq (i32.load8_u (local.get $i)) (i32.const 118)) (then
       (;;) (local.tee $i (i32.add (local.get $i) (i32.const 1)))
       (if (i32.eq (i32.load8_u (;;)) (i32.const 97)) (then
@@ -771,17 +787,131 @@
     (;;) (local.get $addr)
   )
 
+  (func $if (param $i i32) (param $len i32) (result i32 i32)
+    ;; (<1024 ? error : i, addr)
+    (local $addr i32)
+    (local $expr i32)
+
+    (if (i32.ne (i32.load8_u (local.get $i)) (i32.const 153)) (then
+      (;;) (;;) (call $var (local.get $i) (local.get $len))
+      (return (;;) (;;))
+    ))
+
+    (;;) (local.tee $addr (call $alloc (i32.const 14)))
+    (i32.store8 (;;) (i32.const 13)) ;; id
+    (i32.store8 (i32.add (local.get $addr) (i32.const 1)) (i32.const 0)) ;; type
+
+    (;;) (local.tee $i (i32.add (local.get $i) (i32.const 9)))
+    (if (i32.ge_u (;;) (local.get $len)) (then
+      (return (i32.const 2) (local.get $i))
+    ))
+    (;;) (;;) (;;) (call $expr (local.get $i) (local.get $len))
+    (local.set $expr (;;))
+    (;;) (local.tee $i (;;))
+    (if (i32.lt_u (;;) (i32.const 1024)) (then
+      (return (local.get $i) (local.get $expr))
+    ))
+    (drop (;;))
+    (;;) (i32.add (local.get $expr) (i32.const 1))
+    (if (i32.ne (i32.load8_u (;;)) (i32.const 1)) (then
+      (return (i32.const 9) (local.get $expr))
+    ))
+    (i32.store (i32.add (local.get $addr) (i32.const 2)) (local.get $expr))
+      ;; conditional_addr
+
+    (if (i32.ge_u (local.get $i) (local.get $len)) (then
+      (return (i32.const 2) (local.get $i))
+    ))
+    (if (i32.ne (i32.load8_u (local.get $i)) (i32.const 10)) (then
+      (return (i32.const 3) (local.get $i))
+    ))
+
+    (;;) (local.tee $i (i32.add (local.get $i) (i32.const 9)))
+    (if (i32.ge_u (;;) (local.get $len)) (then
+      (return (i32.const 2) (local.get $i))
+    ))
+    (;;) (;;) (call $node
+      (local.get $i)
+      (local.get $len)
+      (i32.const 11)
+      (i32.const 1)
+    )
+    (local.set $expr (;;))
+    (;;) (local.tee $i (;;))
+    (if (i32.lt_u (;;) (i32.const 1024)) (then
+      (return (local.get $i) (local.get $expr))
+    ))
+    (i32.store (i32.add (local.get $addr) (i32.const 6)) (local.get $expr))
+      ;; true_node_addr
+
+    (if (i32.ge_u (local.get $i) (local.get $len)) (then
+      (return (i32.const 2) (local.get $i))
+    ))
+    (if (i32.ne (i32.load8_u (local.get $i)) (i32.const 11)) (then
+      (return (i32.const 3) (local.get $i))
+    ))
+
+    (;;) (local.tee $i (i32.add (local.get $i) (i32.const 9)))
+    (if (i32.ge_u (;;) (local.get $len)) (then
+      (return (i32.const 2) (local.get $i))
+    ))
+    (if (i32.ne (i32.load8_u (local.get $i)) (i32.const 154)) (then
+      (i32.store (i32.add (local.get $addr) (i32.const 10)) (i32.const 0))
+        ;; false_node_addr
+      (return (i32.add (local.get $i) (i32.const 9)) (local.get $addr))
+    ))
+
+    (;;) (local.tee $i (i32.add (local.get $i) (i32.const 9)))
+    (if (i32.ge_u (;;) (local.get $len)) (then
+      (return (i32.const 2) (local.get $i))
+    ))
+    (if (i32.ne (i32.load8_u (local.get $i)) (i32.const 10)) (then
+      (return (i32.const 3) (local.get $i))
+    ))
+
+    (;;) (local.tee $i (i32.add (local.get $i) (i32.const 9)))
+    (if (i32.ge_u (;;) (local.get $len)) (then
+      (return (i32.const 2) (local.get $i))
+    ))
+    (;;) (;;) (call $node
+      (local.get $i)
+      (local.get $len)
+      (i32.const 11)
+      (i32.const 1)
+    )
+    (local.set $expr (;;))
+    (;;) (local.tee $i (;;))
+    (if (i32.lt_u (;;) (i32.const 1024)) (then
+      (return (local.get $i) (local.get $expr))
+    ))
+    (i32.store (i32.add (local.get $addr) (i32.const 10)) (local.get $expr))
+      ;; false_node_addr
+
+    (if (i32.ge_u (local.get $i) (local.get $len)) (then
+      (return (i32.const 2) (local.get $i))
+    ))
+    (if (i32.ne (i32.load8_u (local.get $i)) (i32.const 11)) (then
+      (return (i32.const 3) (local.get $i))
+    ))
+
+    (;;) (i32.add (local.get $i) (i32.const 9))
+    (;;) (local.get $addr)
+  )
+
   (func $stmt (param $i i32) (param $len i32) (result i32 i32)
     ;; (<1024 ? error : i, addr)
     (local $addr i32)
 
-    (;;) (;;) (call $var (local.get $i) (local.get $len))
+    (;;) (;;) (call $if (local.get $i) (local.get $len))
     (local.set $addr (;;))
     (;;) (local.tee $i (;;))
     (if (i32.lt_u (;;) (i32.const 1024)) (then
       (return (local.get $i) (local.get $addr))
     ))
 
+    (if (i32.eq (i32.load8_u (local.get $addr)) (i32.const 13)) (then
+      (return (local.get $i) (local.get $addr))
+    ))
     (if (i32.ge_u (local.get $i) (local.get $len)) (then
       (return (i32.const 2) (local.get $i))
     ))
@@ -1386,7 +1516,53 @@
     (;;) (call $w1 (;;) (i32.const 41)) ;; ")"
   )
 
+  (func $emitIf (param $o i32) (param $addr i32) (result i32)
+    (local $node i32)
+
+    (;;) (call $emitExpression
+      (local.get $o)
+      (i32.load (i32.add (local.get $addr) (i32.const 2)))
+      (i32.const 0)
+    )
+    (;;) (call $w4 (;;) (i32.const 677800232)) ;; "(if("
+    (;;) (call $w4 (;;) (i32.const 1852139636)) ;; "then"
+    (local.set $o (;;))
+
+    (local.set $node (i32.load (i32.add (local.get $addr) (i32.const 6))))
+    (loop $next (if (local.get $node) (then
+      (;;) (call $emitStatement
+        (local.get $o)
+        (i32.load (i32.add (local.get $node) (i32.const 4)))
+      )
+      (local.set $o (;;))
+      (local.set $node (i32.load (local.get $node)))
+      (br $next)
+    )))
+
+    (local.set $node (i32.load (i32.add (local.get $addr) (i32.const 10))))
+    (if (local.get $node) (then
+      (;;) (local.get $o)
+      (;;) (call $w4 (;;) (i32.const 1818568745)) ;; ")(el"
+      (;;) (call $w2 (;;) (i32.const 25971)) ;; "se"
+      (local.set $o (;;))
+    ))
+    (loop $next (if (local.get $node) (then
+      (;;) (call $emitStatement
+        (local.get $o)
+        (i32.load (i32.add (local.get $node) (i32.const 4)))
+      )
+      (local.set $o (;;))
+      (local.set $node (i32.load (local.get $node)))
+      (br $next)
+    )))
+
+    (;;) (call $w2 (local.get $o) (i32.const 10537)) ;; "))"
+  )
+
   (func $emitStatement (param $o i32) (param $addr i32) (result i32)
+    (if (i32.eq (i32.load8_u (local.get $addr)) (i32.const 13)) (then
+      (return (call $emitIf (local.get $o) (local.get $addr)))
+    ))
     (if (i32.eq (i32.load8_u (local.get $addr)) (i32.const 6)) (then
       (return (call $emitVariable (local.get $o) (local.get $addr)))
     ))
@@ -1399,6 +1575,7 @@
 
   (func $emitDeclaration (param $o i32) (param $addr i32) (result i32)
     (if (i32.ne (i32.load8_u (local.get $addr)) (i32.const 6)) (then
+      ;; check if statements
       (return (local.get $o))
     ))
 

@@ -147,6 +147,8 @@ export async function compile(
   "var": 150
   "func": 151
   "export": 152
+  "if": 153
+  "else": 154
   "i32": 200
 */
 
@@ -251,6 +253,13 @@ export async function compile(
     type: i8
     identifier_addr: i32
     parameter_node_addr: i32 | Node?
+  }
+  If: {
+    id: i8 | 13
+    type: i8
+    conditional_addr: i32
+    true_node_addr: i32 | Node?
+    false_node_addr: i32 | Node?
   }
 */
 
