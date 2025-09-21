@@ -858,7 +858,7 @@
     (if (i32.ne (i32.load8_u (local.get $i)) (i32.const 154)) (then
       (i32.store (i32.add (local.get $addr) (i32.const 10)) (i32.const 0))
         ;; false_node_addr
-      (return (i32.add (local.get $i) (i32.const 9)) (local.get $addr))
+      (return (local.get $i) (local.get $addr))
     ))
 
     (;;) (local.tee $i (i32.add (local.get $i) (i32.const 9)))
