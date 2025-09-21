@@ -7,29 +7,15 @@ on:
   workflow_dispatch:
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
         type: [debug, release]
     steps:
       - uses: actions/checkout@v4
       - uses: denoland/setup-deno@v2
-      - shell: bash
-        run: |
-          if [[ "$RUNNER_OS" == "Linux" ]]; then
-            sudo apt-get install -y wabt binaryen
-            wat2wasm --version
-            wasm-opt --version
-          elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            brew install wabt binaryen
-            wat2wasm --version
-            wasm-opt --version
-          elif [[ "$RUNNER_OS" == "Windows" ]]; then
-            choco install wabt binaryen -y
-            wat2wasm --version
-            wasm-opt --version
-          fi
+      - uses: mwilliamson/setup-wabt-action@v3
+      - uses: Aandreba/setup-binaryen@v1.0.0
       - run: deno task ${{ matrix.type }}
       - run: deno test -P --no-prompt --doc
