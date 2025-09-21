@@ -5,28 +5,27 @@
   "permissions": {
     "default": {
       "read": ["."],
-      "write": { "allow": ["."], "deny": ["./deno.json"] },
-      "run": ["wat2wasm"]
-    },
-    "compile": {
-      "read": true,
-      "write": true,
-      "run": ["wat2wasm"]
+      "write": {
+        "allow": ["."],
+        "deny": ["./deno.json", "./.git/", "./.github/", "./src/"]
+      },
+      "run": ["wat2wasm", "wasm-opt"]
     }
   },
   "tasks": {
-    "build": "wat2wasm --debug-names -o src/mod.wasm src/mod.wat",
+    "debug": "wat2wasm src/mod.wat -o src/mod.wasm --debug-names",
+    "release": "wat2wasm src/mod.wat -o /dev/stdout | wasm-opt - -o src/mod.wasm -Oz --enable-multivalue",
     "test": {
-      "command": "deno test -P --doc",
-      "dependencies": ["build"]
+      "command": "deno test -P --no-prompt --doc",
+      "dependencies": ["debug"]
     },
     "run": {
-      "command": "deno run -P src/main.ts",
-      "dependencies": ["build"]
+      "command": "deno run -P --no-prompt src/main.ts",
+      "dependencies": ["debug"]
     },
     "compile": {
-      "command": "deno compile -P=compile --output whatc src/main.ts",
-      "dependencies": ["build"]
+      "command": "deno compile -P --no-prompt --output whatc src/main.ts",
+      "dependencies": ["release"]
     }
   },
   "imports": {
