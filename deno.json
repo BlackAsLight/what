@@ -28,6 +28,7 @@
       "dependencies": ["release"]
     }
   },
+  "publish": { "exclude": ["!src/*.wasm"] },
   "imports": {
     "@std/assert": "jsr:@std/assert@^1.0.13",
     "@std/cli": "jsr:@std/cli@^1.0.21",
