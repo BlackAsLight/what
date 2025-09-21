@@ -20,3 +20,22 @@ jobs:
       - run: wasm-opt --version
       - run: deno task ${{ matrix.type }}
       - run: deno test -P --no-prompt --doc
+  lint:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+      - run: brew install wabt
+      - run: wat2wasm --version
+      - run: deno task debug
+      - run: deno fmt --check
+      - run: deno lint
+  publish--dry-run:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+      - run: brew install wabt
+      - run: wat2wasm --version
+      - run: deno task debug
+      - run: deno publish --dry-run
