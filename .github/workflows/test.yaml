@@ -16,15 +16,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: denoland/setup-deno@v2
-      - run: sudo apt-get update
       - shell: bash
         run: |
           if [[ "$RUNNER_OS" == "Linux" ]]; then
             sudo apt-get install -y wabt binaryen
+            wat2wasm --version
+            wasm-opt --version
           elif [[ "$RUNNER_OS" == "macOS" ]]; then
             brew install wabt binaryen
+            wat2wasm --version
+            wasm-opt --version
           elif [[ "$RUNNER_OS" == "Windows" ]]; then
             choco install wabt binaryen -y
+            wat2wasm --version
+            wasm-opt --version
           fi
       - run: deno task ${{ matrix.type }}
       - run: deno test -P --no-prompt --doc
