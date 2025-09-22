@@ -1,5 +1,12 @@
 import { compile as c, memory } from "./mod.wasm";
 
+export interface WhatOptions {
+  to: "wat" | "wasm";
+  wat2wasm: string[];
+  wasm_opt: string[];
+  signal?: AbortSignal;
+}
+
 export const buffer = new Uint8Array(memory.buffer);
 export const view = new DataView(memory.buffer);
 const decode = function () {
@@ -33,7 +40,7 @@ async function set(
 
 export async function compile(
   input: string | Uint8Array | ReadableStream<Uint8Array>,
-  raw: boolean,
+  options: WhatOptions,
 ): Promise<ReadableStream<Uint8Array>> {
   const [exit_code, addr1, addr2] = c(await set(input)) as unknown as [
     number,
@@ -103,21 +110,39 @@ export async function compile(
     }
   }
 
-  if (raw) return ReadableStream.from([buffer.subarray(addr1, addr2)]);
+  if (options.to === "wat") {
+    return ReadableStream.from([buffer.subarray(addr1, addr2)]);
+  }
 
-  const { stdin, stdout } = new Deno.Command(
-    "wat2wasm",
-    {
-      args: ["-o", "/dev/stdout", "/dev/stdin"],
-      stdin: "piped",
-      stdout: "piped",
-    },
-  )
+  const wat2wasm = new Deno.Command("wat2wasm", {
+    args: [
+      "/dev/stdin",
+      "-o",
+      "/dev/stdout",
+      ...options.wat2wasm,
+    ],
+    stdin: "piped",
+    stdout: "piped",
+    signal: options.signal,
+  })
     .spawn();
-  const writer = stdin.getWriter();
+  const writer = wat2wasm.stdin.getWriter();
   await writer.write(buffer.subarray(addr1, addr2));
   writer.close();
-  return stdout;
+
+  if (options.wasm_opt.length) {
+    const wasm_opt = new Deno.Command("wasm-opt", {
+      args: ["-", "-o", "/dev/stdout", ...options.wasm_opt],
+      stdin: "piped",
+      stdout: "piped",
+      signal: options.signal,
+    })
+      .spawn();
+    wat2wasm.stdout.pipeTo(wasm_opt.stdin);
+    return wasm_opt.stdout;
+  }
+
+  return wat2wasm.stdout;
 }
 
 /* Token Enum // 1 Does not appear in array; merely to remove whitespace

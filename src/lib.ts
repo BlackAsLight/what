@@ -1,5 +1,5 @@
-import { compile as c } from "./mod.ts";
-export { WhatError } from "./mod.ts";
+import { compile as c, WhatError, type WhatOptions } from "./mod.ts";
+export { WhatError, type WhatOptions };
 
 /**
  * @example
@@ -28,8 +28,11 @@ export { WhatError } from "./mod.ts";
  */
 export async function compile(
   input: string | Uint8Array | ReadableStream<Uint8Array>,
-  raw = false,
+  options: Partial<WhatOptions> = {},
 ): Promise<Uint8Array<ArrayBuffer>> {
-  return await new Response(await c(input, raw))
+  options.to ??= "wasm";
+  options.wat2wasm ??= [];
+  options.wasm_opt ??= [];
+  return await new Response(await c(input, options as WhatOptions))
     .bytes() as Uint8Array<ArrayBuffer>;
 }
