@@ -24,7 +24,7 @@
       "dependencies": ["debug"]
     },
     "compile": {
-      "command": "deno compile -P --no-prompt --output whatc src/main.ts",
+      "command": "deno compile -P --no-prompt -o whatc src/main.ts",
       "dependencies": ["release"]
     }
   },
