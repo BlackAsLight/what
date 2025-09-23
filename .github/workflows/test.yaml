@@ -25,21 +25,23 @@ jobs:
       - run: deno task ${{ matrix.type }}
       - run: deno test -P --no-prompt --doc
   lint:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: denoland/setup-deno@v2
-      - run: brew install wabt
-      - run: wat2wasm --version
+      - uses: BlackAsLight/setup-wabt@v1.1.0
+        env:
+          GH_TOKEN: ${{ github.token }}
       - run: deno task debug
       - run: deno fmt --check
       - run: deno lint
   publish--dry-run:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: denoland/setup-deno@v2
-      - run: brew install wabt
-      - run: wat2wasm --version
+      - uses: BlackAsLight/setup-wabt@v1.1.0
+        env:
+          GH_TOKEN: ${{ github.token }}
       - run: deno task debug
       - run: deno publish --dry-run
