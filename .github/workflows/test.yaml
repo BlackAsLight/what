@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: denoland/setup-deno@v2
       - uses: BlackAsLight/setup-wabt@v1.0.0
-      - uses: BlackAsLight/setup-binaryen-toolkit@v1.0.0
+      - uses: BlackAsLight/setup-binaryen@v1.0.0
       - run: deno task ${{ matrix.type }}
       - run: deno test -P --no-prompt --doc
   lint:
