@@ -5,15 +5,18 @@ on:
       - published
 jobs:
   publish:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: denoland/setup-deno@v2
-      - run: brew install wabt binaryen
-      - run: wat2wasm --version
-      - run: wasm-opt --version
+      - uses: BlackAsLight/setup-wabt@v1.1.0
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - uses: BlackAsLight/setup-binaryen@v1.1.0
+        env:
+          GH_TOKEN: ${{ github.token }}
       - run: deno task release
       - run: deno publish
