@@ -23,6 +23,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
       - run: deno task ${{ matrix.type }}
+      - run: wasm-validate src/mod.wasm
       - run: deno test -P --no-prompt --doc
   lint:
     runs-on: ubuntu-latest
