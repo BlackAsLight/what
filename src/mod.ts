@@ -117,7 +117,7 @@ export async function compile(
   const wat2wasm = new Deno.Command("wat2wasm", {
     args: [
       "-",
-      "--output='-'", // v1.0.37 doesn't handle `-o -` properly.
+      "--output=-", // v1.0.37 doesn't handle `-o -` properly.
       ...options.wat2wasm,
     ],
     stdin: "piped",
