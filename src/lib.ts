@@ -16,13 +16,10 @@ export { WhatError, type WhatOptions };
  * }\
  * ";
  *
- * const base64 = encodeBase64(await compile(input));
- * console.log(base64);
- *
  * const x =
  *   (await import(
  *     "data:application/wasm;base64," +
- *       base64
+ *       encodeBase64(await compile(input))
  *   ))
  *     .main(2, 7);
  *

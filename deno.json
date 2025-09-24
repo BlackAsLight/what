@@ -14,7 +14,7 @@
   },
   "tasks": {
     "debug": "wat2wasm src/mod.wat -o src/mod.wasm --debug-names",
-    "release": "wat2wasm src/mod.wat -o /dev/stdout | wasm-opt - -o src/mod.wasm -Oz --enable-multivalue",
+    "release": "wat2wasm src/mod.wat --output='-' | wasm-opt - -o src/mod.wasm -Oz --enable-multivalue",
     "test": {
       "command": "deno test -P --no-prompt --doc",
       "dependencies": ["debug"]

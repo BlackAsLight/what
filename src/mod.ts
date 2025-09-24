@@ -116,9 +116,8 @@ export async function compile(
 
   const wat2wasm = new Deno.Command("wat2wasm", {
     args: [
-      "/dev/stdin",
-      "-o",
-      "/dev/stdout",
+      "-",
+      "--output='-'", // v1.0.37 doesn't handle `-o -` properly.
       ...options.wat2wasm,
     ],
     stdin: "piped",
@@ -132,7 +131,7 @@ export async function compile(
 
   if (options.wasm_opt.length) {
     const wasm_opt = new Deno.Command("wasm-opt", {
-      args: ["-", "-o", "/dev/stdout", ...options.wasm_opt],
+      args: ["-", "-o", "-", ...options.wasm_opt],
       stdin: "piped",
       stdout: "piped",
       signal: options.signal,
